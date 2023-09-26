@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	errs "github.com/bdlm/errors"
@@ -291,7 +292,20 @@ func (chrome *Chrome) Query(
 	}
 
 	uri := fmt.Sprintf("http://%s:%d%s", chrome.Address(), chrome.Port(), path)
-	resp, err := http.Get(uri)
+
+	method := "GET"
+	if strings.Index(path, "/json/new?") == 0 {
+		method = "PUT"
+	}
+
+	req, err := http.NewRequest(method, uri, nil)
+
+	if err != nil {
+		return nil, errs.Wrap(err, codes.ChromeQueryFailed, "create request failed")
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		return nil, errs.Wrap(err, codes.ChromeQueryFailed, "get uri failed")
 	}
