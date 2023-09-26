@@ -1,4 +1,4 @@
-module github.com/mkenney/go-chrome
+module github.com/encobrain/go-chrome
 
 go 1.18
 
